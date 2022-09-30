@@ -1,0 +1,30 @@
+---
+title: "p-chart"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{p-chart}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(FluView)
+```
+
+```{r}
+fv |> 
+  mutate(date = glue::glue("{YEAR}-01-01") |> lubridate::as_date() + (WEEK-1)*7) |> 
+  rename(n = `Total A&B`, N = `TOTAL SPECIMENS`) |> 
+  shewhart.hybrid::P_Chart() |> 
+  shewhart.hybrid::plot_run_chart()
+```
+

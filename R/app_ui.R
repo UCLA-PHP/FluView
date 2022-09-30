@@ -4,13 +4,28 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
+#' @importFrom plotly plotlyOutput
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
     fluidPage(
-      h1("FluView")
+      h1("FluView"),
+      sidebarLayout(
+        sidebarPanel(
+          dateRangeInput(
+            inputId = "dates",
+            label = "Dates to include in SPC analysis",
+            start = min(fv$date),
+            end = max(fv$date)
+          )
+        ),
+        mainPanel(
+          plotly::plotlyOutput("graph1")
+        )
+      )
+
     )
   )
 }
