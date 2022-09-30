@@ -9,30 +9,42 @@
 #' @importFrom cdcfluview who_nrevss
 #' @importFrom dplyr filter
 #' @importFrom plotly renderPlotly
+#' @importFrom cdcfluview who_nrevss
+#' @importFrom dplyr summarize group_by filter
+#' @importFrom lubridate year
+#' @importFrom plotly renderPlotly
+#' @import lubridate
 app_server <- function(input, output, session) {
   # Your application server logic
 
   years =
     seq(
-      from = input$dates[1] |> year(),
-      to = input$dates[2] |> year()
+      from = input$dates[1] |> lubridate::year(),
+      to = input$dates[2] |> lubridate::year()
     ) |>
     reactive()
 
-  dataset0 =
-    cdcfluview::who_nrevss("state", years = years())$clinical_labs |>
-    reactive()
+  dataset0 = cdcfluview::who_nrevss("state")$clinical_labs
 
   dataset =
-    dataset0() |>
+    dataset0 |>
     dplyr::filter(
+      !is.na(total_specimens),
+      !is.na(total_a),
+      !is.na(total_b),
       region %in% input$states,
       wk_date %within% (input$dates |> int_diff())) |>
     dplyr::group_by(wk_date) |>
     dplyr::summarize(
       .groups = "drop",
-      total_specimens = total_specimens |> as.numeric() |> sum(),
-      `TOTAL A&B` = sum(total_a |> as.numeric() + total_b |> as.numeric())
+      total_specimens =
+        total_specimens |>
+        as.numeric() |>
+        sum(na.rm = TRUE),
+      `TOTAL A&B` = sum(
+        total_a |> as.numeric(),
+        total_b |> as.numeric(),
+        na.rm = TRUE)
     ) |>
     reactive()
 
