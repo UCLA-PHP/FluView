@@ -23,7 +23,7 @@ library(FluView)
 ```{r}
 fv |> 
   mutate(date = glue::glue("{YEAR}-01-01") |> lubridate::as_date() + (WEEK-1)*7) |> 
-  rename(n = `Total A&B`, N = `TOTAL SPECIMENS`) |> 
+  dplyr::rename(n = `Total A&B`, N = `TOTAL SPECIMENS`) |> 
   shewhart.hybrid::P_Chart() |> 
   shewhart.hybrid::plot_run_chart()
 ```
