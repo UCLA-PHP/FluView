@@ -10,16 +10,18 @@ BugReports: https://github.com/d-morrison/FluView/issues
 Depends: 
     R (>= 2.10)
 Imports: 
+    cdcfluview,
     config (>= 0.3.1),
+    dplyr,
     golem (>= 0.3.3),
-    pkgload,
+    lubridate,
     plotly,
     shewhart.hybrid,
-    shiny (>= 1.7.2)
+    shiny (>= 1.7.2),
+    shinyWidgets
 Suggests: 
     glue,
     knitr,
-    lubridate,
     rmarkdown
 VignetteBuilder: 
     knitr

@@ -5,6 +5,8 @@
 #' @import shiny
 #' @noRd
 #' @importFrom plotly plotlyOutput
+#' @importFrom lubridate as_date
+#'
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
@@ -14,12 +16,30 @@ app_ui <- function(request) {
       h1("FluView"),
       sidebarLayout(
         sidebarPanel(
+          actionButton("Build P-Chart", inputId = "goButton", class = "btn-success"),
           dateRangeInput(
             inputId = "dates",
             label = "Dates to include in SPC analysis",
-            start = min(fv$date),
-            end = max(fv$date)
-          )
+            start = "2015-10-01",
+            min = "2015-10-01",
+            end = today()
+          ),
+          shinyWidgets::pickerInput(
+            "states",
+            options = shinyWidgets::pickerOptions(
+              `actions-box` = TRUE,
+              `deselect-all-text` = "None",
+              `select-all-text` = "All",
+              liveSearch = TRUE,
+              dropupAuto = TRUE
+            ),
+            multiple = TRUE,
+            label = "States to Include",
+            choices =
+              states,
+            selected =
+              "California"),
+
         ),
         mainPanel(
           plotly::plotlyOutput("graph1")
