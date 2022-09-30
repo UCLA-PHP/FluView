@@ -4,7 +4,11 @@
 \alias{fv_p_chart}
 \title{Title}
 \usage{
-fv_p_chart(dataset = fv)
+fv_p_chart(
+  dataset = dplyr::mutate(filter(cdcfluview::who_nrevss("state", years =
+    2016:2022)$clinical_labs, region == "California"), total_specimens =
+    as.numeric(total_specimens), `TOTAL A&B` = as.numeric(total_a) + as.numeric(total_b))
+)
 }
 \arguments{
 \item{dataset}{some subset of `fv`}

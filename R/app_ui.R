@@ -7,6 +7,9 @@
 #' @importFrom plotly plotlyOutput
 #' @importFrom lubridate as_date
 #'
+#' @importFrom lubridate today
+#' @importFrom plotly plotlyOutput
+#' @importFrom shinyWidgets pickerInput pickerOptions
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
@@ -22,7 +25,7 @@ app_ui <- function(request) {
             label = "Dates to include in SPC analysis",
             start = "2015-10-01",
             min = "2015-10-01",
-            end = today()
+            end = lubridate::today()
           ),
           shinyWidgets::pickerInput(
             "states",
