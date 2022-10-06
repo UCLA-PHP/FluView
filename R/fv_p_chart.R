@@ -28,6 +28,6 @@ fv_p_chart = function(
       n = `TOTAL A&B`,
       N = `total_specimens`,
       date = wk_date) |>
-    shewhart.hybrid::P_Chart() |>
+    shewhart.hybrid::PH_Chart() |>
     shewhart.hybrid::plot_run_chart()
 }
