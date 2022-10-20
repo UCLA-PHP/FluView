@@ -24,7 +24,11 @@ app_server <- function(input, output, session) {
     ) |>
     reactive()
 
-  dataset0 = cdcfluview::who_nrevss("state")$clinical_labs
+  dataset0 =
+    cdcfluview::who_nrevss(
+      # years = 2015:year(today()),
+      "state"
+    )$clinical_labs
 
   dataset =
     dataset0 |>
