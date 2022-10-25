@@ -60,5 +60,15 @@ app_server <- function(input, output, session) {
     }
   )
 
+  plot2 = eventReactive(
+    input$goButton,
+    {
+      validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
+      dataset() |> test_volume_chart()
+
+    }
+  )
+
   output$graph1 = plotly::renderPlotly(plot1())
+  output$graph2 = plotly::renderPlotly(plot2())
 }

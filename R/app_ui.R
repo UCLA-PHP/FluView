@@ -45,7 +45,11 @@ app_ui <- function(request) {
 
         ),
         mainPanel(
-          plotly::plotlyOutput("graph1")
+          h2("Test Positivity Rates"),
+          plotly::plotlyOutput("graph1") |> fluidRow(),
+          h2("Test Counts"),
+          plotly::plotlyOutput("graph2") |> fluidRow()
+
         )
       )
 
