@@ -43,6 +43,40 @@ app_ui <- function(request) {
             selected =
               "California"),
 
+          shinyWidgets::pickerInput(
+            "lab",
+            options = shinyWidgets::pickerOptions(
+              `actions-box` = TRUE,
+              `deselect-all-text` = "None",
+              `select-all-text` = "All",
+              liveSearch = TRUE,
+              dropupAuto = TRUE
+            ),
+            multiple = TRUE,
+            label = "Lab Type",
+            choices =
+              c("public_health_labs", "clinical_labs", "combined_prior_to_2015_16"),
+            selected =
+              "clinical_labs"),
+
+          shinyWidgets::pickerInput(
+            "variant",
+            options = shinyWidgets::pickerOptions(
+              `actions-box` = TRUE,
+              `deselect-all-text` = "None",
+              `select-all-text` = "All",
+              liveSearch = TRUE,
+              dropupAuto = TRUE
+            ),
+            multiple = TRUE,
+            label = "Variant",
+            choices =
+              # cdcfluview::who_nrevss("state")[[input$lab]] |>
+              # select()
+              c("a_2009_h1n1", "a_h3", "a_subtyping_not_performed", "b", "bvic", "byam", "h3n2v"),
+            selected =
+              "a_2009_h1n1")
+
         ),
         mainPanel(
           plotly::plotlyOutput("graph1")

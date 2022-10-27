@@ -18,14 +18,14 @@ fv_p_chart = function(
       filter(region == "California") |>
       dplyr::mutate(
         `total_specimens` = `total_specimens` |> as.numeric(),
-        `TOTAL A&B` = total_a |> as.numeric() + total_b |> as.numeric())
+        `TOTAL A&B` = total_a |> as.numeric() + total_b |> as.numeric()) #TOTAL POSITIVE
 
 )
 {
 
   dataset |>
     dplyr::rename(
-      n = `TOTAL A&B`,
+      n = `TOTAL A&B`, #TOTAL POSITIVE
       N = `total_specimens`,
       date = wk_date) |>
     shewhart.hybrid::PH_Chart() |>

@@ -30,3 +30,4 @@ LazyData: true
 RoxygenNote: 7.2.1
 Remotes:  
     UCLA-PHP/shewhart.hybrid
+

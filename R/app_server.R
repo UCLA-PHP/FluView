@@ -24,10 +24,14 @@ app_server <- function(input, output, session) {
     ) |>
     reactive()
 
-  dataset0 = cdcfluview::who_nrevss("state")$clinical_labs
+  #dataset0 = cdcfluview::who_nrevss("state")$clinical_labs
 
+  dataset_prelab = cdcfluview::who_nrevss("state") #DP Added
+  labs = reactive({
+    input$lab
+  })
   dataset =
-    dataset0 |>
+    dataset_prelab |> combine_labs(lab_name = labs()) |>  #dataset0 |> #DP ADDED
     dplyr::filter(
       !is.na(total_specimens),
       !is.na(total_a),
@@ -47,6 +51,38 @@ app_server <- function(input, output, session) {
         na.rm = TRUE)
     ) |>
     reactive()
+  # test = cdcfluview::who_nrevss("state")
+  # testing =
+  #   test[["clinical_labs"]] |> as_tibble("clinical_labs")
+  # #DP Testing
+  # dataset =
+  #   dataset_prelab[[input$lab]] |>
+  #   dplyr::filter(
+  #     !is.na(total_specimens),
+  #     !is.na(total_a),
+  #     !is.na(total_b),
+  #     region %in% input$states,
+  #     wk_date %within% (input$dates |> int_diff())) |>
+  #   dplyr::group_by(wk_date) |>
+  #   dplyr::summarize(
+  #     .groups = "drop",
+  #     total_specimens =
+  #       total_specimens |>
+  #       as.numeric() |>
+  #       sum(na.rm = TRUE),
+  #     `TOTAL A` = sum(
+  #       a_2009_h1n1 |> as.numeric(),
+  #       a_h3 |> as.numeric(),
+  #       a_subtyping_not_performed |> as.numeric(),
+  #       na.rm = TRUE),
+  #     `TOTAL B` = sum(
+  #       b |> as.numeric(),
+  #       bvic |> as.numeric(),
+  #       byam |> as.numeric(),
+  #       na.rm = TRUE)
+  #
+  #   ) |>
+  #   reactive()
 
   plot1 = eventReactive(
     input$goButton,
