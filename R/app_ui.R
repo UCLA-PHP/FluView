@@ -25,7 +25,8 @@ app_ui <- function(request) {
             label = "Dates to include in SPC analysis",
             start = "2015-10-01",
             min = "2015-10-01",
-            end = lubridate::today()
+            end = lubridate::today(),
+            uiOutput("dateRange")
           ),
           shinyWidgets::pickerInput(
             "states",
@@ -55,7 +56,7 @@ app_ui <- function(request) {
             multiple = TRUE,
             label = "Lab Type",
             choices =
-              c("public_health_labs", "clinical_labs", "combined_prior_to_2015_16"),
+              c("clinical_labs", "combined_prior_to_2015_16"),
             selected =
               "clinical_labs"),
 
@@ -71,11 +72,9 @@ app_ui <- function(request) {
             multiple = TRUE,
             label = "Variant",
             choices =
-              # cdcfluview::who_nrevss("state")[[input$lab]] |>
-              # select()
-              c("a_2009_h1n1", "a_h3", "a_subtyping_not_performed", "b", "bvic", "byam", "h3n2v"),
+              c("a", "b"),
             selected =
-              "a_2009_h1n1")
+              "a")
 
         ),
         mainPanel(

@@ -11,7 +11,7 @@
 #' @examples
 #' combinedDF = combine_labs()
 #' @importFrom dplyr filter
-combine_labs = function(lab_list = cdcfluview::who_nrevss("state"), lab_name = "clinical_labs"){
+combine_labs = function(lab_list = cdcfluview::who_nrevss("state"), lab_name = c("clinical_labs", "combined_prior_to_2015_16")){
   #REMOVE lab_name argument since public health labs is not needed anymore
   bigDF = data.frame()
   for(i in lab_name){
