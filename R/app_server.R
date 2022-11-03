@@ -40,7 +40,7 @@ app_server <- function(input, output, session) {
 
 
   dataset =
-    dataset_prelab |> combine_labs(lab_name = c("combined_prior_to_2015_16", "clinical_labs")) |>
+    dataset_prelab |> combine_labs(lab_name = input$lab) |>
     dplyr::filter(
       !is.na(total_specimens),
       !is.na(total_a),
@@ -54,9 +54,9 @@ app_server <- function(input, output, session) {
         total_specimens |>
         as.numeric() |>
         sum(na.rm = TRUE),
-      `TOTAL POSITIVE` = if(input$variant[1] == "a") {sum(
+      `TOTAL POSITIVE` = if(input$variant[1] == "a" & length(input$variant) == 1) {sum(
         total_a |> as.numeric(), na.rm = TRUE)}
-          else if(input$variant[1] == "b") {sum(
+          else if(input$variant[1] == "b" & length(input$variant) == 1) {sum(
         total_b |> as.numeric(),  na.rm = TRUE)}
           else {sum(
           total_a |> as.numeric(),
