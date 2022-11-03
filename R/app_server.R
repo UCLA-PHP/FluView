@@ -27,21 +27,14 @@ app_server <- function(input, output, session) {
   #dataset0 = cdcfluview::who_nrevss("state")$clinical_labs
 
   dataset_prelab = cdcfluview::who_nrevss("state") #DP Added
-  min(cdcfluview::who_nrevss("state")$clinical_labs$wk_date)
-  labs = reactive({
-    input$lab
-  })
 
-  variants = reactive({
-    input$variant
-  })
 
   observeEvent(
-    labs(),
+    input$lab,
     shiny::updateDateRangeInput(session, inputId  = "dates",
-                                start = if("combined_prior_to_2015_16" %in% labs()) {"2010-10-01"}else{"2015-10-01"},
-                                min = if("combined_prior_to_2015_16" %in% labs()) {"2010-10-01"} else{"2015-10-01"},
-                                end = if("clinical_labs" %in% labs()){lubridate::today()} else{"2015-09-27"}
+                                start = if("combined_prior_to_2015_16" %in% input$lab) {"2010-10-01"}else{"2015-10-01"},
+                                min = if("combined_prior_to_2015_16" %in% input$lab) {"2010-10-01"} else{"2015-10-01"},
+                                end = if("clinical_labs" %in% input$lab){lubridate::today()} else{"2015-09-27"}
                                )
   )
 
@@ -61,9 +54,9 @@ app_server <- function(input, output, session) {
         total_specimens |>
         as.numeric() |>
         sum(na.rm = TRUE),
-      `TOTAL POSITIVE` = if(variants()[1] == "a") {sum(
+      `TOTAL POSITIVE` = if(input$variant[1] == "a") {sum(
         total_a |> as.numeric(), na.rm = TRUE)}
-          else if(variants()[1] == "b") {sum(
+          else if(input$variant[1] == "b") {sum(
         total_b |> as.numeric(),  na.rm = TRUE)}
           else {sum(
           total_a |> as.numeric(),

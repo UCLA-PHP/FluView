@@ -25,8 +25,7 @@ app_ui <- function(request) {
             label = "Dates to include in SPC analysis",
             start = "2015-10-01",
             min = "2015-10-01",
-            end = lubridate::today(),
-            uiOutput("dateRange")
+            end = lubridate::today()
           ),
           shinyWidgets::pickerInput(
             "states",
