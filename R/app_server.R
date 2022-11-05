@@ -52,11 +52,36 @@ app_server <- function(input, output, session) {
     ) |>
     reactive()
 
-  plot1 = eventReactive(
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste('PH_chart-', Sys.time() |> gsub(pattern = "\\:", replacement = "-"), '.csv', sep= '')
+    },
+    content = function(con) {
+      write.csv(chart1(), con)
+    }
+  )
+
+  chart1 = eventReactive(
     input$goButton,
     {
       validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
-      dataset() |> fv_p_chart()
+      chart =
+        dataset() |>
+        dplyr::rename(
+          n = `TOTAL A&B`,
+          N = `total_specimens`,
+          date = wk_date) |>
+        shewhart.hybrid::PH_Chart(Lim_Min = input$Lim_Min)
+
+
+    }
+  )
+
+  plot1 =
+    reactive(
+    {
+      validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
+      chart1() |> shewhart.hybrid::plot_run_chart()
     }
   )
 
