@@ -33,5 +33,5 @@ fv_p_chart = function(
     shewhart.hybrid::PH_Chart(...)
 
   chart |>
-    shewhart.hybrid::plot_run_chart()
+    shewhart.hybrid::plot_run_chart(suffix = "%")
 }
