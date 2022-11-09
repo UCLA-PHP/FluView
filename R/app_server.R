@@ -16,6 +16,22 @@
 #' @import lubridate
 app_server <- function(input, output, session) {
   # Your application server logic
+  setBookmarkExclude(c("bookmark1", "goButton"))
+
+  observeEvent(
+    input$bookmark1,
+    {
+      session$doBookmark()
+
+    })
+
+  onBookmarked(
+    function(url) {
+      # updateQueryString(url)
+      showBookmarkUrlModal(url)
+    }
+  )
+
 
   years =
     seq(
@@ -79,11 +95,11 @@ app_server <- function(input, output, session) {
 
   plot1 =
     reactive(
-    {
-      validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
-      chart1() |> shewhart.hybrid::plot_run_chart()
-    }
-  )
+      {
+        validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
+        chart1() |> shewhart.hybrid::plot_run_chart()
+      }
+    )
 
   plot2 = eventReactive(
     input$goButton,

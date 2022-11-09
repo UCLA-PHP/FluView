@@ -19,6 +19,7 @@ app_ui <- function(request) {
       h1("FluView"),
       sidebarLayout(
         sidebarPanel(
+          bookmarkButton(id = "bookmark1", label = "Bookmark current inputs"),
           actionButton("Build P-Chart", inputId = "goButton", class = "btn-success"),
           dateRangeInput(
             inputId = "dates",
