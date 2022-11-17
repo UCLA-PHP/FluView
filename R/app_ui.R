@@ -46,8 +46,8 @@ app_ui <- function(request) {
 
           shiny::numericInput(
             inputId = "Lim_Min",
-            label = "Min. phase length before a special cause can be detected",
-            min = 0,
+            label = "Minimum phase length before a special cause can be detected",
+            min = 1,
             step = 1,
             value = 4
           )
