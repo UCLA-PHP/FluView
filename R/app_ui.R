@@ -19,6 +19,7 @@ app_ui <- function(request) {
       h1("FluView"),
       sidebarLayout(
         sidebarPanel(
+          bookmarkButton(id = "bookmark1", label = "Bookmark current inputs"),
           actionButton("Build P-Chart", inputId = "goButton", class = "btn-success"),
           dateRangeInput(
             inputId = "dates",
@@ -42,6 +43,7 @@ app_ui <- function(request) {
               states,
             selected =
               "California"),
+
 
           shinyWidgets::pickerInput(
             "lab",
@@ -75,9 +77,26 @@ app_ui <- function(request) {
             selected =
               "a")
 
+          shiny::numericInput(
+            inputId = "Lim_Min",
+            label = "Min. phase length before a special cause can be detected",
+            min = 0,
+            step = 1,
+            value = 4
+          )
+
+
         ),
         mainPanel(
-          plotly::plotlyOutput("graph1")
+          h2("Test Positivity Rates"),
+          fluidRow(
+            downloadButton('downloadData', 'Download Chart Data')
+          ),
+
+          plotly::plotlyOutput("graph1") |> fluidRow(),
+          h2("Test Counts"),
+          plotly::plotlyOutput("graph2") |> fluidRow()
+
         )
       )
 
