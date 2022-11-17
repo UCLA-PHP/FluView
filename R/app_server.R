@@ -25,23 +25,62 @@ app_server <- function(input, output, session) {
     reactive()
 
   #dataset0 = cdcfluview::who_nrevss("state")$clinical_labs
+  progress <- shiny::Progress$new()
+  progress$set(message = "Loading in Data", value = 0)
 
-  dataset_prelab = cdcfluview::who_nrevss("state") #DP Added
+  #THE ISSUE IN WHY IT IS SO SLOW IS ON CDC'S END
+  dataset_prelab = tryCatch(
+    expr = {
+      message('About to Load CDC Data')
+      temp1 = cdcfluview::who_nrevss("state") |> combine_labs(lab_name = c("clinical_labs", "combined_prior_to_2015_16"))
+      message('CDC Data is Loaded')
+      temp1
+    },
+    error = function(e){
+      temp2 = presavedCDCdata_20221117
+      message('CDC is Not Available, Using Backed Up Data')
+      temp2
+    }
 
+  )
+
+
+
+
+  progress$set(message = "Ready to Analyze", value = 1)
+  Sys.sleep(1)
+  progress$close()
 
   observeEvent(
-    input$lab,
+    input$lab,{
     shiny::updateDateRangeInput(session, inputId  = "dates",
                                 start = if("combined_prior_to_2015_16" %in% input$lab) {"2010-10-01"}else{"2015-10-01"},
                                 min = if("combined_prior_to_2015_16" %in% input$lab) {"2010-10-01"} else{"2015-10-01"},
                                 end = if("clinical_labs" %in% input$lab){lubridate::today()} else{"2015-09-27"}
                                )
+
+  }
+  )
+
+  observeEvent(
+    input$lab, {
+
+    shinyWidgets::updatePickerInput(
+      session,
+      inputId = "variant",
+      choices = if("combined_prior_to_2015_16" %in% input$lab) {c("a", "b", "h3n2v")}else{c("a","b")},
+      selected = input$variant
+    )
+    }
   )
 
 
   dataset =
-    dataset_prelab |> combine_labs(lab_name = input$lab) |>
+    {
+      print("before")
+    temp =  dataset_prelab |>
     dplyr::filter(
+      labType %in% input$lab,
       !is.na(total_specimens),
       !is.na(total_a),
       !is.na(total_b),
@@ -58,12 +97,29 @@ app_server <- function(input, output, session) {
         total_a |> as.numeric(), na.rm = TRUE)}
           else if(input$variant[1] == "b" & length(input$variant) == 1) {sum(
         total_b |> as.numeric(),  na.rm = TRUE)}
+          else if(input$variant[1] == "h3n2v" & length(input$variant) == 1) {sum(
+        h3n2v |> as.numeric(),  na.rm = TRUE)}
+          else if("a" %in% input$variant & "b" %in% input$variant & length(input$variant) == 2) {sum(
+        total_a |> as.numeric(),
+        total_b |> as.numeric(),  na.rm = TRUE)}
+      else if("a" %in% input$variant & "h3n2v" %in% input$variant & length(input$variant) == 2) {sum(
+        total_a |> as.numeric(),
+        h3n2v |> as.numeric(),
+        na.rm = TRUE)}
+      else if("h3n2v" %in% input$variant & "b" %in% input$variant & length(input$variant) == 2) {sum(
+        total_b |> as.numeric(),
+        h3n2v |> as.numeric(),
+        na.rm = TRUE)}
           else {sum(
           total_a |> as.numeric(),
           total_b |> as.numeric(),
-          na.rm = TRUE)} ) |>
-    reactive()
+          h3n2v |> as.numeric(),
+          na.rm = TRUE)} )
+    print("after")
+    temp
+    } |> reactive()
 
+  #message("Ready to Analyze", Sys.time())
   # test = cdcfluview::who_nrevss("state")
   # testing =
   #   test[["clinical_labs"]] |> as_tibble("clinical_labs")
@@ -100,10 +156,16 @@ app_server <- function(input, output, session) {
   plot1 = eventReactive(
     input$goButton,
     {
+      progressData <- shiny::Progress$new(session = session, min = 0, max = 1 )
+      progressData$set(message = "Creating Chart", value = 0)
+      on.exit(progressData$set(message = "Displaying Chart", value = 1))
+      on.exit(Sys.sleep(1), add = TRUE)
+      on.exit(progressData$close(), add = TRUE)
+
       validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
       dataset() |> fv_p_chart()
+
     }
   )
-
   output$graph1 = plotly::renderPlotly(plot1())
 }
