@@ -47,12 +47,20 @@ app_server <- function(input, output, session) {
 
   #THE ISSUE IN WHY IT IS SO SLOW IS ON CDC'S END
   dataset_prelab = tryCatch(
-    expr = {
-      message('About to Load CDC Data')
-      temp1 = cdcfluview::who_nrevss("state") |> combine_labs(lab_name = c("clinical_labs", "combined_prior_to_2015_16"))
-      message('CDC Data is Loaded')
-      temp1
-    },
+    expr =
+      {
+        message('About to Load CDC Data')
+
+        temp1 =
+          cdcfluview::who_nrevss("state") |>
+          combine_labs(
+            lab_name = c(
+              "clinical_labs",
+              "combined_prior_to_2015_16"))
+
+        message('CDC Data is Loaded')
+        temp1
+      },
     error = function(e){
       temp2 = presavedCDCdata_20221117
       message('CDC is Not Available, Using Backed Up Data')
@@ -70,24 +78,24 @@ app_server <- function(input, output, session) {
 
   observeEvent(
     input$lab,{
-    shiny::updateDateRangeInput(session, inputId  = "dates",
-                                start = if("combined_prior_to_2015_16" %in% input$lab) {"2010-10-01"}else{"2015-10-01"},
-                                min = if("combined_prior_to_2015_16" %in% input$lab) {"2010-10-01"} else{"2015-10-01"},
-                                end = if("clinical_labs" %in% input$lab){lubridate::today()} else{"2015-09-27"}
-                               )
+      shiny::updateDateRangeInput(session, inputId  = "dates",
+                                  start = if("combined_prior_to_2015_16" %in% input$lab) {"2010-10-01"}else{"2015-10-01"},
+                                  min = if("combined_prior_to_2015_16" %in% input$lab) {"2010-10-01"} else{"2015-10-01"},
+                                  end = if("clinical_labs" %in% input$lab){lubridate::today()} else{"2015-09-27"}
+      )
 
-  }
+    }
   )
 
   observeEvent(
     input$lab, {
 
-    shinyWidgets::updatePickerInput(
-      session,
-      inputId = "variant",
-      choices = if("combined_prior_to_2015_16" %in% input$lab) {c("a", "b", "h3n2v")}else{c("a","b")},
-      selected = input$variant
-    )
+      shinyWidgets::updatePickerInput(
+        session,
+        inputId = "variant",
+        choices = if("combined_prior_to_2015_16" %in% input$lab) {c("a", "b", "h3n2v")}else{c("a","b")},
+        selected = input$variant
+      )
     }
   )
 
@@ -95,46 +103,31 @@ app_server <- function(input, output, session) {
 
   dataset =
     {
-      print("before")
-    temp =  dataset_prelab |>
-    dplyr::filter(
-      labType %in% input$lab,
-      !is.na(total_specimens),
-      !is.na(total_a),
-      !is.na(total_b),
-      region %in% input$states,
-      wk_date %within% (input$dates |> int_diff())) |>
-    dplyr::group_by(wk_date) |>
-    dplyr::summarize(
-      .groups = "drop",
-      total_specimens =
-        total_specimens |>
-        as.numeric() |>
-        sum(na.rm = TRUE),
-      `TOTAL POSITIVE` = if(input$variant[1] == "a" & length(input$variant) == 1) {sum(
-        total_a |> as.numeric(), na.rm = TRUE)}
-          else if(input$variant[1] == "b" & length(input$variant) == 1) {sum(
-        total_b |> as.numeric(),  na.rm = TRUE)}
-          else if(input$variant[1] == "h3n2v" & length(input$variant) == 1) {sum(
-        h3n2v |> as.numeric(),  na.rm = TRUE)}
-          else if("a" %in% input$variant & "b" %in% input$variant & length(input$variant) == 2) {sum(
-        total_a |> as.numeric(),
-        total_b |> as.numeric(),  na.rm = TRUE)}
-      else if("a" %in% input$variant & "h3n2v" %in% input$variant & length(input$variant) == 2) {sum(
-        total_a |> as.numeric(),
-        h3n2v |> as.numeric(),
-        na.rm = TRUE)}
-      else if("h3n2v" %in% input$variant & "b" %in% input$variant & length(input$variant) == 2) {sum(
-        total_b |> as.numeric(),
-        h3n2v |> as.numeric(),
-        na.rm = TRUE)}
-          else {sum(
-          total_a |> as.numeric(),
-          total_b |> as.numeric(),
-          h3n2v |> as.numeric(),
-          na.rm = TRUE)} )
-    print("after")
-    temp
+      message("before merging data")
+
+      temp =
+        dataset_prelab |>
+        dplyr::filter(
+          labType %in% input$lab,
+          complete.cases(total_specimens),
+          region %in% input$states,
+          wk_date %within% (input$dates |> int_diff())) |>
+        dplyr::group_by(wk_date) |>
+        dplyr::summarize(
+          .groups = "drop",
+          total_specimens =
+            total_specimens |>
+            as.numeric() |>
+            sum(na.rm = TRUE),
+          `TOTAL POSITIVE` =
+            sum(
+              across(
+                input$variant |>
+                  str_replace_all(
+                    c("a" = "total_a", "b" = "total_b")))))
+
+      message("after merging data")
+      temp
     } |> reactive()
 
   #message("Ready to Analyze", Sys.time())
@@ -173,7 +166,11 @@ app_server <- function(input, output, session) {
 
   output$downloadData <- downloadHandler(
     filename = function() {
-      paste('PH_chart-', Sys.time() |> gsub(pattern = "\\:", replacement = "-"), '.csv', sep= '')
+      paste(
+        'PH_chart-',
+        Sys.time() |> gsub(pattern = "\\:", replacement = "-"),
+        '.csv',
+        sep = '')
     },
     content = function(con) {
       write.csv(chart1(), con)
@@ -194,7 +191,7 @@ app_server <- function(input, output, session) {
       chart =
         dataset() |>
         dplyr::rename(
-          n = `TOTAL A&B`,
+          n = `TOTAL POSITIVE`,
           N = `total_specimens`,
           date = wk_date) |>
         shewhart.hybrid::PH_Chart(Lim_Min = input$Lim_Min)
@@ -204,7 +201,8 @@ app_server <- function(input, output, session) {
   )
 
   plot1 =
-    reactive(
+    eventReactive(
+      input$goButton,
       {
         validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
         chart1() |> shewhart.hybrid::plot_run_chart()

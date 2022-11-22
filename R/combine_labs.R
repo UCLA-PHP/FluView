@@ -11,11 +11,17 @@
 #' @examples
 #' combinedDF = combine_labs()
 #' @importFrom dplyr filter
-combine_labs = function(lab_list = cdcfluview::who_nrevss("state"), lab_name = c("clinical_labs", "combined_prior_to_2015_16")){
+combine_labs = function(
+    lab_list = cdcfluview::who_nrevss("state"),
+    lab_name = c("clinical_labs", "combined_prior_to_2015_16"))
+{
   #REMOVE lab_name argument since public health labs is not needed anymore
   bigDF = data.frame()
-  for(i in lab_name){
-    if(i == "public_health_labs"){
+  for(i in lab_name)
+  {
+
+    if(i == "public_health_labs")
+    {
       tempDF = lab_list[[i]] %>%
         mutate(across(total_specimens:h3n2v, ~ as.integer(.x)),
                total_a = rowSums(across(a_2009_h1n1:a_subtyping_not_performed)),

@@ -75,7 +75,7 @@ app_ui <- function(request) {
             choices =
               c("a", "b"),
             selected =
-              "a")
+              "a"),
 
           shiny::numericInput(
             inputId = "Lim_Min",
