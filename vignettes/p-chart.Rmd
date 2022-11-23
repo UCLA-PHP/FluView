@@ -23,6 +23,6 @@ library(FluView)
 ```{r}
 fv |> 
   dplyr::rename(n = `TOTAL A&B`, N = `TOTAL SPECIMENS`) |> 
-  shewhart.hybrid::PH_Chart(Lim_Min = 50)
+  shewhart.hybrid::PH_Chart(Lim_Min = 1)
 ```
 

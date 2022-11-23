@@ -187,14 +187,14 @@ app_server <- function(input, output, session) {
       on.exit(progressData$close(), add = TRUE)
 
       validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
-
+      validate(need(input$Lim_Min > 0, "Need a minimum phase length > 0."))
       chart =
         dataset() |>
         dplyr::rename(
           n = `TOTAL POSITIVE`,
           N = `total_specimens`,
           date = wk_date) |>
-        shewhart.hybrid::PH_Chart(Lim_Min = input$Lim_Min)
+        shewhart.hybrid::PH_Chart(Lim_Min = input$Lim_Min |> ceiling())
 
 
     }
