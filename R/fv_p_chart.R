@@ -1,14 +1,11 @@
 #' Title
 #'
-#' @param dataset some subset of `fv`
+#' @param dataset some subset of `presaved_CDC_data`
 #' @param ... arguments passed to shewhart.hybrid::PH_Chart(...)
 #'
 #' @return a plotly graph
 #' @export
 #'
-#' @importFrom shewhart.hybrid plot_run_chart P_Chart
-#' @importFrom dplyr rename
-#' @importFrom shewhart.hybrid plot_run_chart P_Chart
 #' @importFrom dplyr rename mutate
 #' @importFrom shewhart.hybrid plot_run_chart P_Chart
 fv_p_chart = function(

@@ -56,9 +56,9 @@ combine_labs = function(
     # BIND ROWS AND LEAVE NAS FOR DIFFERENT COLUMNS
   }
 
-  return(bigDF |> tibble())
-
-
-
+  return(
+    bigDF |>
+    tibble() |>
+    arrange(region, wk_date))
 
 }
