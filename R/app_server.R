@@ -121,6 +121,7 @@ app_server <- function(input, output, session) {
             sum(na.rm = TRUE),
           `TOTAL POSITIVE` =
             sum(
+              na.rm = TRUE,
               across(
                 input$variant |>
                   stringr::str_replace_all(
@@ -180,14 +181,17 @@ app_server <- function(input, output, session) {
   chart1 = eventReactive(
     input$goButton,
     {
+
       progressData <- shiny::Progress$new(session = session, min = 0, max = 1 )
       progressData$set(message = "Creating Chart", value = 0)
+
       on.exit(progressData$set(message = "Displaying Chart", value = 1))
       on.exit(Sys.sleep(1), add = TRUE)
       on.exit(progressData$close(), add = TRUE)
 
       validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
       validate(need(input$Lim_Min > 0, "Need a minimum phase length > 0."))
+
       chart =
         dataset() |>
         dplyr::rename(
@@ -196,7 +200,6 @@ app_server <- function(input, output, session) {
           date = wk_date) |>
         shewhart.hybrid::PH_Chart(Lim_Min = input$Lim_Min |> ceiling())
 
-
     }
   )
 
@@ -204,6 +207,7 @@ app_server <- function(input, output, session) {
     eventReactive(
       input$goButton,
       {
+
         validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
         chart1() |> shewhart.hybrid::plot_run_chart()
       }
