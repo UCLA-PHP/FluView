@@ -44,7 +44,6 @@ app_server <- function(input, output, session) {
   dataset_prelab = tryCatch(
     expr =
       {
-        stop()
         message('About to Load CDC Data')
 
         temp1 =
