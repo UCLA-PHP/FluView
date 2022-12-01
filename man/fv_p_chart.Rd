@@ -5,13 +5,16 @@
 \title{Title}
 \usage{
 fv_p_chart(
-  dataset = dplyr::mutate(filter(cdcfluview::who_nrevss("state", years =
-    2016:2022)$clinical_labs, region == "California"), total_specimens =
-    as.numeric(total_specimens), `TOTAL A&B` = as.numeric(total_a) + as.numeric(total_b))
+  dataset = dplyr::mutate(filter(presaved_CDC_data, region == "California"),
+    total_specimens = as.numeric(total_specimens), `TOTAL POSITIVE` = as.numeric(total_a)
+    + as.numeric(total_b)),
+  ...
 )
 }
 \arguments{
 \item{dataset}{some subset of `fv`}
+
+\item{...}{arguments passed to shewhart.hybrid::PH_Chart(...)}
 }
 \value{
 a plotly graph

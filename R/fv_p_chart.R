@@ -13,16 +13,12 @@
 #' @importFrom shewhart.hybrid plot_run_chart P_Chart
 fv_p_chart = function(
     dataset =
-      cdcfluview::who_nrevss(
-        "state",
-        years = 2016:2022)$clinical_labs |>
+      presaved_CDC_data |>
       filter(region == "California") |>
       dplyr::mutate(
         `total_specimens` = `total_specimens` |> as.numeric(),
-
-        `TOTAL POSITIVE` = total_a |> as.numeric() + total_b |> as.numeric()) #TOTAL POSITIVE (NOW DEPENDENT ON WHAT USER CHOOSES)
-
-
+        `TOTAL POSITIVE` = total_a |> as.numeric() + total_b |> as.numeric()),
+    ...
 )
 {
 

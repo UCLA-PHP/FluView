@@ -4,26 +4,21 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
-#' @importFrom plotly renderPlotly
-#' @importFrom lubridate %within% int_diff
 #' @importFrom cdcfluview who_nrevss
-#' @importFrom dplyr filter
+#' @importFrom dplyr summarize group_by filter rename
+#' @importFrom lubridate year today
 #' @importFrom plotly renderPlotly
-#' @importFrom cdcfluview who_nrevss
-#' @importFrom dplyr summarize group_by filter
-#' @importFrom lubridate year
-#' @importFrom plotly renderPlotly
-#' @import lubridate
+#' @importFrom shewhart.hybrid PH_Chart plot_run_chart
+#' @importFrom shiny Progress updateDateRangeInput
+#' @importFrom shinyWidgets updatePickerInput
+#' @importFrom stringr str_replace_all
 app_server <- function(input, output, session) {
   # Your application server logic
   setBookmarkExclude(c("bookmark1", "goButton"))
 
   observeEvent(
     input$bookmark1,
-    {
-      session$doBookmark()
-
-    })
+    session$doBookmark())
 
   onBookmarked(
     function(url) {
@@ -49,6 +44,7 @@ app_server <- function(input, output, session) {
   dataset_prelab = tryCatch(
     expr =
       {
+        stop()
         message('About to Load CDC Data')
 
         temp1 =
@@ -61,8 +57,10 @@ app_server <- function(input, output, session) {
         message('CDC Data is Loaded')
         temp1
       },
-    error = function(e){
-      temp2 = presavedCDCdata_20221117
+    error = function(e)
+    {
+
+      temp2 = presaved_CDC_data
       message('CDC is Not Available, Using Backed Up Data')
       temp2
     }
@@ -76,24 +74,26 @@ app_server <- function(input, output, session) {
   Sys.sleep(1)
   progress$close()
 
-  observeEvent(
-    input$lab,{
-      shiny::updateDateRangeInput(session, inputId  = "dates",
-                                  start = if("combined_prior_to_2015_16" %in% input$lab) {"2010-10-01"}else{"2015-10-01"},
-                                  min = if("combined_prior_to_2015_16" %in% input$lab) {"2010-10-01"} else{"2015-10-01"},
-                                  end = if("clinical_labs" %in% input$lab){lubridate::today()} else{"2015-09-27"}
-      )
 
-    }
-  )
+  shiny::updateDateRangeInput(
+    session,
+    inputId  = "dates",
+    start = if("combined_prior_to_2015_16" %in% input$lab) "2010-10-01" else "2015-10-01",
+    min = if("combined_prior_to_2015_16" %in% input$lab) "2010-10-01" else "2015-10-01",
+    end = if("clinical_labs" %in% input$lab) lubridate::today() else "2015-09-27"
+  ) |> observeEvent(eventExpr = input$lab)
+
+
 
   observeEvent(
     input$lab, {
 
+      choices = if("combined_prior_to_2015_16" %in% input$lab) c("a", "b", "h3n2v") else c("a","b")
+
       shinyWidgets::updatePickerInput(
-        session,
+        session = session,
         inputId = "variant",
-        choices = if("combined_prior_to_2015_16" %in% input$lab) {c("a", "b", "h3n2v")}else{c("a","b")},
+        choices = choices,
         selected = input$variant
       )
     }
@@ -123,7 +123,7 @@ app_server <- function(input, output, session) {
             sum(
               across(
                 input$variant |>
-                  str_replace_all(
+                  stringr::str_replace_all(
                     c("a" = "total_a", "b" = "total_b")))))
 
       message("after merging data")

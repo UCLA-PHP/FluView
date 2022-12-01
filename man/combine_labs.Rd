@@ -4,11 +4,22 @@
 \alias{combine_labs}
 \title{Title}
 \usage{
-combine_labs(lab_list, lab_name = "clinial_labs")
+combine_labs(
+  lab_list = cdcfluview::who_nrevss("state"),
+  lab_name = c("clinical_labs", "combined_prior_to_2015_16")
+)
 }
 \arguments{
-\item{lab_name}{}
+\item{lab_list}{(The dataset that contains lists of dataframes)}
+
+\item{lab_name}{(The desired labs that want to be analyzed)}
+}
+\value{
+(A dataframe that combines all desired labs in lab_name)
 }
 \description{
 Title
+}
+\examples{
+combinedDF = combine_labs()
 }
