@@ -119,12 +119,11 @@ app_server <- function(input, output, session) {
             as.numeric() |>
             sum(na.rm = TRUE),
           `TOTAL POSITIVE` =
-            sum(
-              na.rm = TRUE,
-              across(
-                input$variant |>
-                  stringr::str_replace_all(
-                    c("a" = "total_a", "b" = "total_b")))))
+            input$variant |>
+            stringr::str_replace_all(
+              c("a" = "total_a", "b" = "total_b")) |>
+            across() |>
+            sum(na.rm = TRUE))
 
       message("after merging data")
       temp
