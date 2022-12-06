@@ -6,7 +6,7 @@
 #' @noRd
 #' @importFrom cdcfluview who_nrevss
 #' @importFrom dplyr summarize group_by filter rename
-#' @importFrom lubridate year today
+#' @importFrom lubridate year today %within% int_diff
 #' @importFrom plotly renderPlotly
 #' @importFrom shewhart.hybrid PH_Chart plot_run_chart
 #' @importFrom shiny Progress updateDateRangeInput
@@ -110,7 +110,7 @@ app_server <- function(input, output, session) {
           labType %in% input$lab,
           complete.cases(total_specimens),
           region %in% input$states,
-          wk_date %within% (input$dates |> int_diff())) |>
+          wk_date %within% (input$dates |> lubridate::int_diff())) |>
         dplyr::group_by(wk_date) |>
         dplyr::summarize(
           .groups = "drop",
@@ -122,7 +122,7 @@ app_server <- function(input, output, session) {
             input$variant |>
             stringr::str_replace_all(
               c("a" = "total_a", "b" = "total_b")) |>
-            across() |>
+            dplyr::across() |>
             sum(na.rm = TRUE))
 
       message("after merging data")
@@ -141,7 +141,7 @@ app_server <- function(input, output, session) {
   #     !is.na(total_a),
   #     !is.na(total_b),
   #     region %in% input$states,
-  #     wk_date %within% (input$dates |> int_diff())) |>
+  #     wk_date %within% (input$dates |> lubridate::int_diff())) |>
   #   dplyr::group_by(wk_date) |>
   #   dplyr::summarize(
   #     .groups = "drop",
