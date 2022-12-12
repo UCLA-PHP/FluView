@@ -1,4 +1,4 @@
-## code to prepare `presaved_CDC_data` dataset goes here
+load_all()
 
 presaved_CDC_data =
   cdcfluview::who_nrevss(region = "state") |>
