@@ -59,7 +59,7 @@ app_ui <- function(request) {
             choices =
               c("clinical_labs", "combined_prior_to_2015_16"),
             selected =
-              "clinical_labs"),
+              c("clinical_labs", "combined_prior_to_2015_16")),
 
           shinyWidgets::pickerInput(
             "variant",
@@ -73,14 +73,14 @@ app_ui <- function(request) {
             multiple = TRUE,
             label = "Variant",
             choices =
-              c("a", "b"),
+              c("a", "b", "h3n2v"),
             selected =
-              "a")
+              c("a", "b", "h3n2v")),
 
           shiny::numericInput(
             inputId = "Lim_Min",
-            label = "Min. phase length before a special cause can be detected",
-            min = 0,
+            label = "Minimum phase length before a special cause can be detected",
+            min = 1,
             step = 1,
             value = 4
           )
