@@ -44,6 +44,39 @@ app_ui <- function(request) {
             selected =
               "California"),
 
+
+          shinyWidgets::pickerInput(
+            "lab",
+            options = shinyWidgets::pickerOptions(
+              `actions-box` = TRUE,
+              `deselect-all-text` = "None",
+              `select-all-text` = "All",
+              liveSearch = TRUE,
+              dropupAuto = TRUE
+            ),
+            multiple = TRUE,
+            label = "Lab Type",
+            choices =
+              c("clinical_labs", "combined_prior_to_2015_16"),
+            selected =
+              c("clinical_labs", "combined_prior_to_2015_16")),
+
+          shinyWidgets::pickerInput(
+            "variant",
+            options = shinyWidgets::pickerOptions(
+              `actions-box` = TRUE,
+              `deselect-all-text` = "None",
+              `select-all-text` = "All",
+              liveSearch = TRUE,
+              dropupAuto = TRUE
+            ),
+            multiple = TRUE,
+            label = "Variant",
+            choices =
+              c("a", "b", "h3n2v"),
+            selected =
+              c("a", "b", "h3n2v")),
+
           shiny::numericInput(
             inputId = "Lim_Min",
             label = "Minimum phase length before a special cause can be detected",
@@ -51,6 +84,7 @@ app_ui <- function(request) {
             step = 1,
             value = 4
           )
+
 
         ),
         mainPanel(
