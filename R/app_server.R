@@ -16,22 +16,6 @@
 #' @import lubridate
 app_server <- function(input, output, session) {
   # Your application server logic
-  setBookmarkExclude(c("bookmark1", "goButton"))
-
-  observeEvent(
-    input$bookmark1,
-    {
-      session$doBookmark()
-
-    })
-
-  onBookmarked(
-    function(url) {
-      # updateQueryString(url)
-      showBookmarkUrlModal(url)
-    }
-  )
-
 
   years =
     seq(
@@ -39,7 +23,6 @@ app_server <- function(input, output, session) {
       to = input$dates[2] |> lubridate::year()
     ) |>
     reactive()
-
 
   #dataset0 = cdcfluview::who_nrevss("state")$clinical_labs
   progress <- shiny::Progress$new()
@@ -92,7 +75,6 @@ app_server <- function(input, output, session) {
   )
 
 
-
   dataset =
     {
       print("before")
@@ -111,28 +93,43 @@ app_server <- function(input, output, session) {
         total_specimens |>
         as.numeric() |>
         sum(na.rm = TRUE),
-      `TOTAL POSITIVE` = if(input$variant[1] == "a" & length(input$variant) == 1) {sum(
-        total_a |> as.numeric(), na.rm = TRUE)}
-          else if(input$variant[1] == "b" & length(input$variant) == 1) {sum(
-        total_b |> as.numeric(),  na.rm = TRUE)}
-          else if(input$variant[1] == "h3n2v" & length(input$variant) == 1) {sum(
-        h3n2v |> as.numeric(),  na.rm = TRUE)}
-          else if("a" %in% input$variant & "b" %in% input$variant & length(input$variant) == 2) {sum(
-        total_a |> as.numeric(),
-        total_b |> as.numeric(),  na.rm = TRUE)}
-      else if("a" %in% input$variant & "h3n2v" %in% input$variant & length(input$variant) == 2) {sum(
-        total_a |> as.numeric(),
-        h3n2v |> as.numeric(),
-        na.rm = TRUE)}
-      else if("h3n2v" %in% input$variant & "b" %in% input$variant & length(input$variant) == 2) {sum(
-        total_b |> as.numeric(),
-        h3n2v |> as.numeric(),
-        na.rm = TRUE)}
-          else {sum(
-          total_a |> as.numeric(),
-          total_b |> as.numeric(),
-          h3n2v |> as.numeric(),
-          na.rm = TRUE)} )
+      `TOTAL POSITIVE` = if(input$variant[1] == "a" &
+                            length(input$variant) == 1) {
+        sum(total_a |> as.numeric(), na.rm = TRUE)
+      }
+      else if (input$variant[1] == "b" &
+               length(input$variant) == 1) {
+        sum(total_b |> as.numeric(),  na.rm = TRUE)
+      }
+      else if (input$variant[1] == "h3n2v" &
+               length(input$variant) == 1) {
+        sum(h3n2v |> as.numeric(),  na.rm = TRUE)
+      }
+      else if ("a" %in% input$variant &
+               "b" %in% input$variant & length(input$variant) == 2) {
+        sum(total_a |> as.numeric(),
+            total_b |> as.numeric(),  na.rm = TRUE)
+      }
+      else if ("a" %in% input$variant &
+               "h3n2v" %in% input$variant & length(input$variant) == 2) {
+        sum(total_a |> as.numeric(),
+            h3n2v |> as.numeric(),
+            na.rm = TRUE)
+      }
+
+      else if ("h3n2v" %in% input$variant &
+               "b" %in% input$variant & length(input$variant) == 2) {
+        sum(total_b |> as.numeric(),
+            h3n2v |> as.numeric(),
+            na.rm = TRUE)
+      }
+      else {
+        sum(total_a |> as.numeric(),
+            total_b |> as.numeric(),
+            h3n2v |> as.numeric(),
+            na.rm = TRUE)
+      }
+    )
     print("after")
     temp
     } |> reactive()
@@ -171,16 +168,7 @@ app_server <- function(input, output, session) {
   #   ) |>
   #   reactive()
 
-  output$downloadData <- downloadHandler(
-    filename = function() {
-      paste('PH_chart-', Sys.time() |> gsub(pattern = "\\:", replacement = "-"), '.csv', sep= '')
-    },
-    content = function(con) {
-      write.csv(chart1(), con)
-    }
-  )
-
-  chart1 = eventReactive(
+  plot1 = eventReactive(
     input$goButton,
     {
       progressData <- shiny::Progress$new(session = session, min = 0, max = 1 )
@@ -190,36 +178,9 @@ app_server <- function(input, output, session) {
       on.exit(progressData$close(), add = TRUE)
 
       validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
-
-      chart =
-        dataset() |>
-        dplyr::rename(
-          n = `TOTAL A&B`,
-          N = `total_specimens`,
-          date = wk_date) |>
-        shewhart.hybrid::PH_Chart(Lim_Min = input$Lim_Min)
-
-
-    }
-  )
-
-  plot1 =
-    reactive(
-      {
-        validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
-        chart1() |> shewhart.hybrid::plot_run_chart()
-      }
-    )
-
-  plot2 = eventReactive(
-    input$goButton,
-    {
-      validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
-      dataset() |> test_volume_chart()
-
+      dataset() |> fv_p_chart()
 
     }
   )
   output$graph1 = plotly::renderPlotly(plot1())
-  output$graph2 = plotly::renderPlotly(plot2())
 }
