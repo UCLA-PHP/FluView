@@ -27,7 +27,10 @@ test_volume_chart = function(
       mode = "markers+lines",
       type = "scatter",
       x = ~wk_date,
-      y = ~`total_specimens`
+      y = ~`total_specimens`,
+      hoverinfo = "text",
+      hovertext = paste("Specimen Count: ", dataset$total_specimens,
+                        "<br> Date: ", dataset$wk_date)
     ) |>
     plotly::layout(
       yaxis = list(title = "Specimens per day (count)")
