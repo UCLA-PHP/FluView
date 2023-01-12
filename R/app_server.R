@@ -41,34 +41,69 @@ app_server <- function(input, output, session) {
   progress$set(message = "Loading in Data", value = 0)
 
   #THE ISSUE IN WHY IT IS SO SLOW IS ON CDC'S END
-  dataset_prelab = tryCatch(
-    expr =
-      {
-        message('About to Load CDC Data')
+#   data_placeHolder = "placeHolder"
+#   trigger = "On"
+#   message(trigger)
+#   while(trigger == "On"){
+#     trigger = "Off"
+#     #Observeevent here
+#   dataset_prelab = tryCatch(
+#     expr =
+#       {
+#         message('About to Load CDC Data')
+#         stop()
+#         temp1 =
+#           cdcfluview::who_nrevss("state") |>
+#           combine_labs(
+#             lab_name = c(
+#               "clinical_labs",
+#               "combined_prior_to_2015_16"))
+#
+#         message('CDC Data is Loaded')
+#         data_placeHolder = "CDC"
+#
+#         temp1
+#       },
+#     error = function(e)
+#     {
+#
+#       temp2 = presaved_CDC_data
+#       message('CDC is Not Available, Using Backed Up Data')
+#       temp2
+#     }
+#
+#   )
+# }
+#   message(trigger)
 
-        temp1 =
-          cdcfluview::who_nrevss("state") |>
-          combine_labs(
-            lab_name = c(
-              "clinical_labs",
-              "combined_prior_to_2015_16"))
+  #Wrap in observe Event
+data_placeHolder = "empty"
+dataset_prelab = NULL
+observeEvent(eventExpr = input$reloadingCDC, ignoreNULL = FALSE,
+            {
+dataset_prelab = try({
+  message('About to Load CDC Data')
+  #stop()
+  temp1 =
+    cdcfluview::who_nrevss("state") |>
+    combine_labs(
+      lab_name = c(
+        "clinical_labs",
+        "combined_prior_to_2015_16"))
 
-        message('CDC Data is Loaded')
-        temp1
-      },
-    error = function(e)
-    {
+  message('CDC Data is Loaded')
+  data_placeHolder = "CDC"
 
-      temp2 = presaved_CDC_data
-      message('CDC is Not Available, Using Backed Up Data')
-      temp2
-    }
+  temp1
+}
+)
+if(inherits(dataset_prelab, "try-error")){
+  dataset_prelab = presaved_CDC_data
+  message('CDC is Not Available, Using Backed Up Data')
+  data_placeHolder = "PRESAVED"
+}
 
-  )
-
-
-
-
+})
   progress$set(message = "Ready to Analyze", value = 1)
   Sys.sleep(1)
   progress$close()
@@ -87,7 +122,7 @@ app_server <- function(input, output, session) {
   observeEvent(
     input$lab, {
 
-      choices = if("combined_prior_to_2015_16" %in% input$lab) c("a", "b", "h3n2v") else c("a","b")
+      choices = if("combined_prior_to_2015_16" %in% input$lab) setNames(c("a", "b", "h3n2v"), c("A Virus", "B Virus", "H3N2 Virus")) else setNames(c("a", "b"), c("A Virus", "B Virus"))
 
       shinyWidgets::updatePickerInput(
         session = session,
@@ -98,6 +133,17 @@ app_server <- function(input, output, session) {
     }
   )
 
+  output$data_text = renderText({paste0("Data Source:\n", if(data_placeHolder == "CDC") "Live CDC" else "Presaved CDC Data" )})
+  message(data_placeHolder)
+  message("ran")
+    output$reloadCDC = renderUI({actionButton(inputId = "reloadingCDC",type = "hidden",label = "Reload Live CDC", class = "btn-success")})
+    eventReactive(
+      input$reloadingCDC,
+      {
+        message(trigger)
+        trigger = "On"
+      }
+    )
 
 
   dataset =

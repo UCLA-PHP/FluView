@@ -11,6 +11,9 @@
 #' @importFrom plotly plotlyOutput
 #' @importFrom shinyWidgets pickerInput pickerOptions
 app_ui <- function(request) {
+
+  Variant =
+
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
@@ -57,10 +60,11 @@ app_ui <- function(request) {
             multiple = TRUE,
             label = "Lab Type",
             choices =
-              c("clinical_labs", "combined_prior_to_2015_16"),
+              setNames(c("clinical_labs", "combined_prior_to_2015_16"), c("Clinical Lab", "Clinical and Public Health Labs Before 2015") ),
+            #1/11/23 Addition ^
             selected =
-              c("clinical_labs", "combined_prior_to_2015_16")),
-
+              setNames(c("clinical_labs", "combined_prior_to_2015_16"), c("Clinical Lab", "Clinical and Public Health Labs Before 2015") )),
+            #1/11/23 Addition ^
           shinyWidgets::pickerInput(
             "variant",
             options = shinyWidgets::pickerOptions(
@@ -73,18 +77,22 @@ app_ui <- function(request) {
             multiple = TRUE,
             label = "Variant",
             choices =
-              c("a", "b", "h3n2v"),
+              setNames(c("a", "b", "h3n2v"), c("Influenza A", "Influenza B", "Influenza H3N2")),
+            #1/11/23 Addition ^
             selected =
-              c("a", "b", "h3n2v")),
-
+              setNames(c("a", "b", "h3n2v"), c("Influenza A", "Influenza B", "Influenza H3N2"))),
+          #1/11/23 Addition ^
+          #https://shinyapps.dreamrs.fr/shinyWidgets/
           shiny::numericInput(
             inputId = "Lim_Min",
             label = "Minimum phase length before a special cause can be detected",
             min = 1,
             step = 1,
             value = 4
-          )
+          ),
 
+        verbatimTextOutput("data_text"),
+        uiOutput("reloadCDC")
 
         ),
         mainPanel(
