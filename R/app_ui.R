@@ -92,7 +92,7 @@ app_ui <- function(request) {
           ),
 
         verbatimTextOutput("data_text"),
-        uiOutput("reloadCDC")
+        actionButton(inputId = "reloadingCDC",label = "Reload Live CDC", class = "btn-success")
 
         ),
         mainPanel(
