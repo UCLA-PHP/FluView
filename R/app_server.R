@@ -37,76 +37,89 @@ app_server <- function(input, output, session) {
 
 
   #dataset0 = cdcfluview::who_nrevss("state")$clinical_labs
-  progress <- shiny::Progress$new()
-  progress$set(message = "Loading in Data", value = 0)
+  # progress <- shiny::Progress$new()
+  # progress$set(message = "Loading in Data", value = 0)
 
   #THE ISSUE IN WHY IT IS SO SLOW IS ON CDC'S END
-#   data_placeHolder = "placeHolder"
-#   trigger = "On"
-#   message(trigger)
-#   while(trigger == "On"){
-#     trigger = "Off"
-#     #Observeevent here
-#   dataset_prelab = tryCatch(
-#     expr =
-#       {
-#         message('About to Load CDC Data')
-#         stop()
-#         temp1 =
-#           cdcfluview::who_nrevss("state") |>
-#           combine_labs(
-#             lab_name = c(
-#               "clinical_labs",
-#               "combined_prior_to_2015_16"))
-#
-#         message('CDC Data is Loaded')
-#         data_placeHolder = "CDC"
-#
-#         temp1
-#       },
-#     error = function(e)
-#     {
-#
-#       temp2 = presaved_CDC_data
-#       message('CDC is Not Available, Using Backed Up Data')
-#       temp2
-#     }
-#
-#   )
-# }
-#   message(trigger)
-
-  #Wrap in observe Event
-data_placeHolder = "empty"
+  data_placeHolder = "placeHolder"
+  #trigger = "On"
+  #message(trigger)
+  #trigger = "Off"
+    #Observeevent here
 dataset_prelab = NULL
-observeEvent(eventExpr = input$reloadingCDC, ignoreNULL = FALSE,
-            {
-dataset_prelab = try({
-  message('About to Load CDC Data')
-  #stop()
-  temp1 =
-    cdcfluview::who_nrevss("state") |>
-    combine_labs(
-      lab_name = c(
-        "clinical_labs",
-        "combined_prior_to_2015_16"))
+makeReactiveBinding("dataset_prelab")
+observeEvent(eventExpr = input$reloadingCDC,  ignoreNULL = FALSE, ignoreInit = TRUE, #IgnoreNull makes it run initially, ignoreInit makes it so it wont run twice (oddly)
+               {
+                 message("DID THIS RUN")
+                 progress <- shiny::Progress$new()
+                 progress$set(message = "Loading in Data", value = 0)
+  # dataset_prelab <<- tryCatch( #<<- symbol will make it in the parent scope (be able to use outside of observeEvent)
+  #   expr =
+  #     {
+  #       message('About to Load CDC Data')
+  #       #stop()
+  #       temp1 =
+  #         cdcfluview::who_nrevss("state") |>
+  #         combine_labs(
+  #           lab_name = c(
+  #             "clinical_labs",
+  #             "combined_prior_to_2015_16"))
+  #
+  #       message('CDC Data is Loaded')
+  #       data_placeHolder <<- "CDC"
+  #
+  #       temp1
+  #     },
+  #   error = function(e)
+  #   {
+  #
+  #     temp2 = presaved_CDC_data
+  #     message('CDC is Not Available, Using Backed Up Data')
+  #     #message(temp2[1,1])
+  #     temp2
+  #
+  #   }
+  #
+  # )
+                 dataset_prelab <<- try({
+                   message('About to Load CDC Data')
+                   #stop()
+                   temp1 =
+                     cdcfluview::who_nrevss("state") |>
+                     combine_labs(
+                       lab_name = c(
+                         "clinical_labs",
+                         "combined_prior_to_2015_16"))
 
-  message('CDC Data is Loaded')
-  data_placeHolder = "CDC"
+                   message('CDC Data is Loaded')
 
-  temp1
-}
-)
-if(inherits(dataset_prelab, "try-error")){
-  dataset_prelab = presaved_CDC_data
-  message('CDC is Not Available, Using Backed Up Data')
-  data_placeHolder = "PRESAVED"
-}
 
-})
+                   temp1
+                 }
+                 )
+                 if(inherits(dataset_prelab, "try-error")){
+                   dataset_prelab = presaved_CDC_data
+                   message('CDC is Not Available, Using Backed Up Data')
+                   data_placeHolder <<- "PRESAVED"
+                 }else{data_placeHolder <<- "CDC"}
+
   progress$set(message = "Ready to Analyze", value = 1)
   Sys.sleep(1)
   progress$close()
+               })
+#  message(trigger)
+
+  #Wrap in observe Event
+# data_placeHolder = "empty"
+# dataset_prelab = c()
+# observeEvent(eventExpr = input$reloadingCDC, ignoreNULL = FALSE,
+#             {
+
+#
+# })
+  # progress$set(message = "Ready to Analyze", value = 1)
+  # Sys.sleep(1)
+  # progress$close()
 
 
   shiny::updateDateRangeInput(
@@ -136,20 +149,20 @@ if(inherits(dataset_prelab, "try-error")){
   output$data_text = renderText({paste0("Data Source:\n", if(data_placeHolder == "CDC") "Live CDC" else "Presaved CDC Data" )})
   message(data_placeHolder)
   message("ran")
-    output$reloadCDC = renderUI({actionButton(inputId = "reloadingCDC",type = "hidden",label = "Reload Live CDC", class = "btn-success")})
-    eventReactive(
-      input$reloadingCDC,
-      {
-        message(trigger)
-        trigger = "On"
-      }
-    )
+    output$reloadCDC = renderUI({actionButton(inputId = "reloadingCDC",label = "Reload Live CDC", class = "btn-success")})
+    # eventReactive(
+    #   input$reloadingCDC,
+    #   {
+    #     message(trigger)
+    #     trigger = "On"
+    #   }
+    # )
 
 
   dataset =
     {
       message("before merging data")
-
+      #message(dataset_prelab[1,1])
       temp =
         dataset_prelab |>
         dplyr::filter(
