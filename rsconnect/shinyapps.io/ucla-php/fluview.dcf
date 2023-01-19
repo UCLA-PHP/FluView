@@ -1,0 +1,11 @@
+name: fluview
+title:
+username:
+account: ucla-php
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7842784
+bundleId: 6607742
+url: https://ucla-php.shinyapps.io/fluview/
+when: 1670457666.75997
+lastSyncTime: 1670457666.75998
