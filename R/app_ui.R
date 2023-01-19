@@ -24,6 +24,9 @@ app_ui <- function(request) {
         sidebarPanel(
           bookmarkButton(id = "bookmark1", label = "Bookmark current inputs"),
           actionButton("Build P-Chart", inputId = "goButton", class = "btn-success"),
+          br(),
+          br(),
+
           dateRangeInput(
             inputId = "dates",
             label = "Dates to include in SPC analysis",
@@ -91,7 +94,15 @@ app_ui <- function(request) {
             value = 4
           ),
 
-        verbatimTextOutput("data_text"),
+
+        HTML("<b>Current Data Source: </b>"),
+        textOutput("data_source"),
+        br(),
+
+        HTML("<b>Last CDC Server Connection Attempt: </b>"),
+        textOutput("last_connection_time"),
+
+        br(),
         actionButton(inputId = "reloadingCDC",label = "Reload Live CDC", class = "btn-success")
 
         ),
