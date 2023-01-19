@@ -73,7 +73,7 @@ app_server <- function(input, output, session) {
       {
         message('CDC Data is Loaded')
         last_load_result("succeeded")
-        data_source(paste("CDC: Loaded", Sys.time()))
+        data_source(paste("CDC database: downloaded", Sys.time()))
         attr(cdc, "date") = Sys.time()
         dataset_prelab(cdc)
       }

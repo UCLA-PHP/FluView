@@ -99,11 +99,11 @@ app_ui <- function(request) {
         textOutput("data_source"),
         br(),
 
-        HTML("<b>Last CDC Server Connection Attempt: </b>"),
+        HTML("<b>Last CDC Database Connection Attempt: </b>"),
         textOutput("last_connection_time"),
 
         br(),
-        actionButton(inputId = "reloadingCDC",label = "Reload Live CDC", class = "btn-success")
+        actionButton(inputId = "reloadingCDC",label = "Connect to CDC Database", class = "btn-success")
 
         ),
         mainPanel(
