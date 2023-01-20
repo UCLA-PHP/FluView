@@ -122,7 +122,7 @@ app_server <- function(input, output, session) {
     renderText()
 
 
-    # output$reloadCDC = renderUI({actionButton(inputId = "reloadingCDC",label = "Reload Live CDC", class = "btn-success")})
+  # output$reloadCDC = renderUI({actionButton(inputId = "reloadingCDC",label = "Reload Live CDC", class = "btn-success")})
   # eventReactive(
   #   input$reloadingCDC,
   #   {
@@ -133,33 +133,15 @@ app_server <- function(input, output, session) {
 
 
   dataset =
-    {
-      message("before merging data")
-      #message(dataset_prelab[1,1])
-      temp =
-        dataset_prelab() |>
-        dplyr::filter(
-          labType %in% input$lab,
-          complete.cases(total_specimens),
-          region %in% input$states,
-          wk_date %within% (input$dates |> lubridate::int_diff())) |>
-        dplyr::group_by(wk_date) |>
-        dplyr::summarize(
-          .groups = "drop",
-          total_specimens =
-            total_specimens |>
-            as.numeric() |>
-            sum(na.rm = TRUE),
-          `TOTAL POSITIVE` =
-            input$variant |>
-            stringr::str_replace_all(
-              c("a" = "total_a", "b" = "total_b")) |>
-            dplyr::across() |>
-            sum(na.rm = TRUE))
-
-      message("after merging data")
-      temp
-    } |> reactive()
+    dataset_prelab() |>
+    merge_data(
+      lab_types = input$lab,
+      regions = input$states,
+      dates = input$dates,
+      variants = input$variant,
+      verbose = TRUE
+    ) |>
+    reactive()
 
   output$downloadData <- downloadHandler(
     filename = function() {
