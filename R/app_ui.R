@@ -11,6 +11,9 @@
 #' @importFrom plotly plotlyOutput
 #' @importFrom shinyWidgets pickerInput pickerOptions
 app_ui <- function(request) {
+
+  Variant =
+
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
@@ -21,6 +24,9 @@ app_ui <- function(request) {
         sidebarPanel(
           bookmarkButton(id = "bookmark1", label = "Bookmark current inputs"),
           actionButton("Build P-Chart", inputId = "goButton", class = "btn-success"),
+          br(),
+          br(),
+
           dateRangeInput(
             inputId = "dates",
             label = "Dates to include in SPC analysis",
@@ -44,13 +50,60 @@ app_ui <- function(request) {
             selected =
               "California"),
 
+
+          shinyWidgets::pickerInput(
+            "lab",
+            options = shinyWidgets::pickerOptions(
+              `actions-box` = TRUE,
+              `deselect-all-text` = "None",
+              `select-all-text` = "All",
+              liveSearch = TRUE,
+              dropupAuto = TRUE
+            ),
+            multiple = TRUE,
+            label = "Lab Type",
+            choices =
+              setNames(c("clinical_labs", "combined_prior_to_2015_16"), c("Clinical Lab", "Clinical and Public Health Labs Before 2015") ),
+            #1/11/23 Addition ^
+            selected =
+              setNames(c("clinical_labs", "combined_prior_to_2015_16"), c("Clinical Lab", "Clinical and Public Health Labs Before 2015") )),
+            #1/11/23 Addition ^
+          shinyWidgets::pickerInput(
+            "variant",
+            options = shinyWidgets::pickerOptions(
+              `actions-box` = TRUE,
+              `deselect-all-text` = "None",
+              `select-all-text` = "All",
+              liveSearch = TRUE,
+              dropupAuto = TRUE
+            ),
+            multiple = TRUE,
+            label = "Variant",
+            choices =
+              setNames(c("a", "b", "h3n2v"), c("Influenza A", "Influenza B", "Influenza H3N2")),
+            #1/11/23 Addition ^
+            selected =
+              setNames(c("a", "b", "h3n2v"), c("Influenza A", "Influenza B", "Influenza H3N2"))),
+          #1/11/23 Addition ^
+          #https://shinyapps.dreamrs.fr/shinyWidgets/
           shiny::numericInput(
             inputId = "Lim_Min",
             label = "Minimum phase length before a special cause can be detected",
             min = 1,
             step = 1,
             value = 4
-          )
+          ),
+
+
+        HTML("<b>Current Data Source: </b>"),
+        textOutput("data_source"),
+        br(),
+
+        HTML("<b>Last CDC Database Connection Attempt: </b>"),
+        textOutput("last_connection_time"),
+
+        br(),
+        actionButton(inputId = "reloadingCDC",label = "Connect to CDC Database", class = "btn-success")
 
         ),
         mainPanel(
