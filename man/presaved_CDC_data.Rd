@@ -5,7 +5,7 @@
 \alias{presaved_CDC_data}
 \title{FluView data for all states}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 34074 rows and 19 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 34290 rows and 19 columns.
 }
 \usage{
 presaved_CDC_data
