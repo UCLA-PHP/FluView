@@ -11,8 +11,8 @@
 #' @export
 #'
 merge_data = function(
-  dataset,
-  lab_types,
+    dataset,
+    lab_types,
     regions,
     dates,
     variants,
@@ -23,10 +23,10 @@ merge_data = function(
   merged_data =
     dataset |>
     dplyr::filter(
-    labType %in% lab_types,
-    complete.cases(total_specimens),
-    region %in% regions,
-    wk_date %within% (dates |> lubridate::int_diff())) |>
+      labType %in% lab_types,
+      complete.cases(total_specimens),
+      region %in% regions,
+      wk_date %within% (dates |> lubridate::int_diff())) |>
     dplyr::group_by(wk_date) |>
     dplyr::summarize(
       .groups = "drop",
