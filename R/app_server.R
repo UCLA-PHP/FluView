@@ -27,13 +27,6 @@ app_server <- function(input, output, session) {
     }
   )
 
-  years =
-    seq(
-      from = input$dates[1] |> lubridate::year(),
-      to = input$dates[2] |> lubridate::year()
-    ) |>
-    reactive()
-
   data_source =
     paste("Presaved CDC Data, downloaded ",  attr(presaved_CDC_data, "date")) |>
     reactiveVal()
