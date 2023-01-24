@@ -50,7 +50,7 @@ app_server <- function(input, output, session) {
       cli::cli_alert('About to Load CDC Data')
       cdc =
         cdcfluview::who_nrevss("state") |>
-        combine_labs(
+        rbind_labs(
           lab_name = c(
             "clinical_labs",
             "combined_prior_to_2015_16")) |>
