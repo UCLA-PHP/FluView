@@ -9,9 +9,9 @@
 #' @export
 #'
 #' @examples
-#' combinedDF = combine_labs()
+#' combinedDF = rbind_labs()
 #' @importFrom dplyr filter
-combine_labs = function(
+rbind_labs = function(
     lab_list = cdcfluview::who_nrevss("state"),
     lab_name = c("clinical_labs", "combined_prior_to_2015_16"))
 {

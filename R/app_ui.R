@@ -14,113 +14,118 @@ app_ui <- function(request) {
 
   Variant =
 
-  tagList(
-    # Leave this function for adding external resources
-    golem_add_external_resources(),
-    # Your application UI logic
-    fluidPage(
-      h1("FluView"),
-      sidebarLayout(
-        sidebarPanel(
-          bookmarkButton(id = "bookmark1", label = "Bookmark current inputs"),
-          actionButton("Build P-Chart", inputId = "goButton", class = "btn-success"),
-          br(),
-          br(),
+    tagList(
+      # Leave this function for adding external resources
+      golem_add_external_resources(),
+      # Your application UI logic
+      fluidPage(
+        h1("FluView"),
+        sidebarLayout(
+          sidebarPanel(
+            bookmarkButton(id = "bookmark1", label = "Bookmark current inputs"),
+            actionButton("Build P-Chart", inputId = "goButton", class = "btn-success"),
+            br(),
+            br(),
 
-          dateRangeInput(
-            inputId = "dates",
-            label = "Dates to include in SPC analysis",
-            start = "2015-10-01",
-            min = "2015-10-01",
-            end = lubridate::today()
-          ),
-          shinyWidgets::pickerInput(
-            "states",
-            options = shinyWidgets::pickerOptions(
-              `actions-box` = TRUE,
-              `deselect-all-text` = "None",
-              `select-all-text` = "All",
-              liveSearch = TRUE,
-              dropupAuto = TRUE
+            dateRangeInput(
+              inputId = "dates",
+              label = "Dates to include in SPC analysis",
+              start = "2015-10-01",
+              min = "2015-10-01",
+              end = lubridate::today()
             ),
-            multiple = TRUE,
-            label = "States to Include",
-            choices =
-              states,
-            selected =
-              "California"),
+            shinyWidgets::pickerInput(
+              "states",
+              options = shinyWidgets::pickerOptions(
+                `actions-box` = TRUE,
+                `deselect-all-text` = "None",
+                `select-all-text` = "All",
+                liveSearch = TRUE,
+                dropupAuto = TRUE
+              ),
+              multiple = TRUE,
+              label = "States to Include",
+              choices =
+                states,
+              selected =
+                "California"),
 
 
-          shinyWidgets::pickerInput(
-            "lab",
-            options = shinyWidgets::pickerOptions(
-              `actions-box` = TRUE,
-              `deselect-all-text` = "None",
-              `select-all-text` = "All",
-              liveSearch = TRUE,
-              dropupAuto = TRUE
+            shinyWidgets::pickerInput(
+              "lab",
+              options = shinyWidgets::pickerOptions(
+                `actions-box` = TRUE,
+                `deselect-all-text` = "None",
+                `select-all-text` = "All",
+                liveSearch = TRUE,
+                dropupAuto = TRUE
+              ),
+              multiple = TRUE,
+              label = "Lab Type",
+              choices =
+                c(
+                  "Clinical Labs (after 2015)" = "clinical_labs",
+                  "Clinical and Public Health Labs (before 2015)" = "combined_prior_to_2015_16"),
+
+              selected = c("clinical_labs", "combined_prior_to_2015_16")
             ),
-            multiple = TRUE,
-            label = "Lab Type",
-            choices =
-              setNames(c("clinical_labs", "combined_prior_to_2015_16"), c("Clinical Lab", "Clinical and Public Health Labs Before 2015") ),
-            #1/11/23 Addition ^
-            selected =
-              setNames(c("clinical_labs", "combined_prior_to_2015_16"), c("Clinical Lab", "Clinical and Public Health Labs Before 2015") )),
-            #1/11/23 Addition ^
-          shinyWidgets::pickerInput(
-            "variant",
-            options = shinyWidgets::pickerOptions(
-              `actions-box` = TRUE,
-              `deselect-all-text` = "None",
-              `select-all-text` = "All",
-              liveSearch = TRUE,
-              dropupAuto = TRUE
+
+            shinyWidgets::pickerInput(
+              "variant",
+              options = shinyWidgets::pickerOptions(
+                `actions-box` = TRUE,
+                `deselect-all-text` = "None",
+                `select-all-text` = "All",
+                liveSearch = TRUE,
+                dropupAuto = TRUE
+              ),
+              multiple = TRUE,
+              label = "Variant",
+              choices =
+                c(
+                  "Influenza A Virus" = "a",
+                  "Influenza B Virus" = "b",
+                  "H3N2 Virus" = "h3n2v"
+                ),
+
+              selected = c("a", "b", "h3n2v")
             ),
-            multiple = TRUE,
-            label = "Variant",
-            choices =
-              setNames(c("a", "b", "h3n2v"), c("Influenza A", "Influenza B", "Influenza H3N2")),
-            #1/11/23 Addition ^
-            selected =
-              setNames(c("a", "b", "h3n2v"), c("Influenza A", "Influenza B", "Influenza H3N2"))),
-          #1/11/23 Addition ^
-          #https://shinyapps.dreamrs.fr/shinyWidgets/
-          shiny::numericInput(
-            inputId = "Lim_Min",
-            label = "Minimum phase length before a special cause can be detected",
-            min = 1,
-            step = 1,
-            value = 4
+
+            shiny::numericInput(
+              inputId = "Lim_Min",
+              label = "Minimum observations before new phase",
+              min = 1,
+              step = 1,
+              value = 4
+            ),
+
+
+            HTML("<b>Current Data Source: </b>"),
+            textOutput("data_source"),
+            br(),
+
+            HTML("<b>Last CDC Database Connection Attempt: </b>"),
+            textOutput("last_connection_time"),
+
+            br(),
+            actionButton(inputId = "reloadingCDC",label = "Connect to CDC Database", class = "btn-success")
+
           ),
+          mainPanel(
+            h2("Test Positivity Rates"),
+            fluidRow(
+              downloadButton('downloadData', 'Download Chart Data')
+            ),
 
+            plotly::plotlyOutput("graph1") |> fluidRow(),
+            h2("Test Counts"),
+            plotly::plotlyOutput("graph2") |> fluidRow()
 
-        HTML("<b>Current Data Source: </b>"),
-        textOutput("data_source"),
-        br(),
-
-        HTML("<b>Last CDC Database Connection Attempt: </b>"),
-        textOutput("last_connection_time"),
-
-        br(),
-        actionButton(inputId = "reloadingCDC",label = "Connect to CDC Database", class = "btn-success")
-
-        ),
-        mainPanel(
-          h2("Test Positivity Rates"),
-          fluidRow(
-            downloadButton('downloadData', 'Download Chart Data')
-          ),
-
-          plotly::plotlyOutput("graph1") |> fluidRow(),
-          h2("Test Counts"),
-          plotly::plotlyOutput("graph2") |> fluidRow()
-
+          )
         )
-      )
 
+      )
     )
-  )
 }
 
 #' Add external Resources to the Application
