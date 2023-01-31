@@ -33,6 +33,7 @@ test_volume_chart = function(
                         "<br> Date: ", dataset$wk_date)
     ) |>
     plotly::layout(
+      xaxis = list(title = ""),
       yaxis = list(title = "Specimens per day (count)")
     )
 

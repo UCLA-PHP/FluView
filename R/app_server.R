@@ -33,7 +33,6 @@ app_server <- function(input, output, session) {
 
   last_load_attempt = reactiveVal(NA)
   last_load_result = reactiveVal(NA)
-
   dataset_prelab = reactiveVal(presaved_CDC_data)
 
   observeEvent(
