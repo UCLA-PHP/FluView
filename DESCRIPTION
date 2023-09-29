@@ -22,8 +22,10 @@ Imports:
     shewhart.hybrid (>= 0.1.0),
     shiny (>= 1.7.2),
     shinyWidgets,
+    stats,
     stringr,
-    tibble
+    tibble,
+    utils
 Suggests: 
     knitr,
     rmarkdown
