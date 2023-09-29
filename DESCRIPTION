@@ -34,3 +34,4 @@ LazyData: true
 RoxygenNote: 7.2.3
 Remotes: 
     UCLA-PHP/shewhart.hybrid
+Roxygen: list(markdown = TRUE)

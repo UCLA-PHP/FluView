@@ -11,7 +11,7 @@ test_volume_chart(
 )
 }
 \arguments{
-\item{dataset}{some subset of `fv`}
+\item{dataset}{some subset of \code{fv}}
 }
 \value{
 a plotly graph
