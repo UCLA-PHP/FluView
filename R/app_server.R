@@ -36,6 +36,7 @@ app_server <- function(input, output, session) {
     reactive()
 
 
+  #dataset0 = cdcfluview::who_nrevss("state")$clinical_labs
   progress <- shiny::Progress$new()
   progress$set(message = "Loading in Data", value = 0)
 
@@ -98,65 +99,9 @@ app_server <- function(input, output, session) {
   )
 
 
+
   dataset =
     {
-
-#
-#     temp =  dataset_prelab |>
-#     dplyr::filter(
-#       labType %in% input$lab,
-#       !is.na(total_specimens),
-#       !is.na(total_a),
-#       !is.na(total_b),
-#       region %in% input$states,
-#       wk_date %within% (input$dates |> int_diff())) |>
-#     dplyr::group_by(wk_date) |>
-#     dplyr::summarize(
-#       .groups = "drop",
-#       total_specimens =
-#         total_specimens |>
-#         as.numeric() |>
-#         sum(na.rm = TRUE),
-#       `TOTAL POSITIVE` = if(input$variant[1] == "a" &
-#                             length(input$variant) == 1) {
-#         sum(total_a |> as.numeric(), na.rm = TRUE)
-#       }
-#       else if (input$variant[1] == "b" &
-#                length(input$variant) == 1) {
-#         sum(total_b |> as.numeric(),  na.rm = TRUE)
-#       }
-#       else if (input$variant[1] == "h3n2v" &
-#                length(input$variant) == 1) {
-#         sum(h3n2v |> as.numeric(),  na.rm = TRUE)
-#       }
-#       else if ("a" %in% input$variant &
-#                "b" %in% input$variant & length(input$variant) == 2) {
-#         sum(total_a |> as.numeric(),
-#             total_b |> as.numeric(),  na.rm = TRUE)
-#       }
-#       else if ("a" %in% input$variant &
-#                "h3n2v" %in% input$variant & length(input$variant) == 2) {
-#         sum(total_a |> as.numeric(),
-#             h3n2v |> as.numeric(),
-#             na.rm = TRUE)
-#       }
-#
-#       else if ("h3n2v" %in% input$variant &
-#                "b" %in% input$variant & length(input$variant) == 2) {
-#         sum(total_b |> as.numeric(),
-#             h3n2v |> as.numeric(),
-#             na.rm = TRUE)
-#       }
-#       else {
-#         sum(total_a |> as.numeric(),
-#             total_b |> as.numeric(),
-#             h3n2v |> as.numeric(),
-#             na.rm = TRUE)
-#       }
-#     )
-#     print("after")
-#     temp
-# #=======
       message("before merging data")
 
       temp =
@@ -179,49 +124,13 @@ app_server <- function(input, output, session) {
               c("a" = "total_a", "b" = "total_b")) |>
             dplyr::across() |>
             sum(na.rm = TRUE))
-      #
-      # message("after merging data")
-      # temp
-#>>>>>>> 32e6f8596e117ff2d197f952d3bb5a70f8a82b17
+
+      message("after merging data")
+      temp
     } |> reactive()
 
-  #message("Ready to Analyze", Sys.time())
-  # test = cdcfluview::who_nrevss("state")
-  # testing =
-  #   test[["clinical_labs"]] |> as_tibble("clinical_labs")
-  # #DP Testing
-  # dataset =
-  #   dataset_prelab[[input$lab]] |>
-  #   dplyr::filter(
-  #     !is.na(total_specimens),
-  #     !is.na(total_a),
-  #     !is.na(total_b),
-  #     region %in% input$states,
-  #     wk_date %within% (input$dates |> lubridate::int_diff())) |>
-  #   dplyr::group_by(wk_date) |>
-  #   dplyr::summarize(
-  #     .groups = "drop",
-  #     total_specimens =
-  #       total_specimens |>
-  #       as.numeric() |>
-  #       sum(na.rm = TRUE),
-  #     `TOTAL A` = sum(
-  #       a_2009_h1n1 |> as.numeric(),
-  #       a_h3 |> as.numeric(),
-  #       a_subtyping_not_performed |> as.numeric(),
-  #       na.rm = TRUE),
-  #     `TOTAL B` = sum(
-  #       b |> as.numeric(),
-  #       bvic |> as.numeric(),
-  #       byam |> as.numeric(),
-  #       na.rm = TRUE)
-  #
-  #   ) |>
-  #   reactive()
 
-#<<<<<<< HEAD
-  plot1 = eventReactive(
-#=======
+
   output$downloadData <- downloadHandler(
     filename = function() {
       paste(
@@ -234,9 +143,8 @@ app_server <- function(input, output, session) {
       write.csv(chart1(), con)
     }
   )
-)
+
   chart1 = eventReactive(
-#>>>>>>> 32e6f8596e117ff2d197f952d3bb5a70f8a82b17
     input$goButton,
     {
 
@@ -248,9 +156,6 @@ app_server <- function(input, output, session) {
       on.exit(progressData$close(), add = TRUE)
 
       validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
-#<<<<<<< HEAD
-      dataset() |> fv_p_chart()
-#=======
       validate(need(input$Lim_Min > 0, "Need a minimum phase length > 0."))
 
       chart =
@@ -280,9 +185,8 @@ app_server <- function(input, output, session) {
       validate(need(nrow(dataset()) > 0, "No data found for these filter settings."))
       dataset() |> test_volume_chart()
 
-#>>>>>>> 32e6f8596e117ff2d197f952d3bb5a70f8a82b17
-
     }
   )
   output$graph1 = plotly::renderPlotly(plot1())
+  output$graph2 = plotly::renderPlotly(plot2())
 }

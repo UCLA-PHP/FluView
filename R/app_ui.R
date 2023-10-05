@@ -75,11 +75,7 @@ app_ui <- function(request) {
             choices =
               c("a", "b", "h3n2v"),
             selected =
-#<<<<<<< HEAD
-              "a"),
-#=======
               c("a", "b", "h3n2v")),
-#>>>>>>> 32e6f8596e117ff2d197f952d3bb5a70f8a82b17
 
           shiny::numericInput(
             inputId = "Lim_Min",
@@ -105,6 +101,7 @@ app_ui <- function(request) {
       )
 
     )
+  )
 
 }
 
