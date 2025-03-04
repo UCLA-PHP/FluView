@@ -8,7 +8,7 @@ License: MIT + file LICENSE
 URL: https://github.com/d-morrison/FluView
 BugReports: https://github.com/d-morrison/FluView/issues
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5)
 Imports: 
     cdcfluview (>= 1.0.0.9000),
     cli,
@@ -34,7 +34,7 @@ VignetteBuilder:
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
-Remotes:  
+Remotes: 
     UCLA-PHP/shewhart.hybrid,
     hrbrmstr/cdcfluview
 Roxygen: list(markdown = TRUE)
